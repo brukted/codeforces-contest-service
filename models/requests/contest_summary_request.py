@@ -6,7 +6,7 @@ from pydantic import BaseModel, model_validator
 class ContestSummaryRequest(BaseModel):
     gym_id: int = -1
     virtual_enabled: bool
-    virtual_deadline_utc: datetime.datetime | None
+    virtual_deadline_utc: int | None
     handles: list[str]
 
     @model_validator(mode="after")

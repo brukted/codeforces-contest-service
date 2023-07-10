@@ -91,7 +91,6 @@ class CodeForcesService:
                 ),
             )
         )
-
         dual_participants = in_contest_participants.intersection(virtual_participants)
 
         result: list[Standing] = []
@@ -117,13 +116,16 @@ class CodeForcesService:
         submissions_lookup: dict[int, Submission] = {sub.id: sub for sub in submissions}
 
         # remove non in contest participation if virtual disabled
-        standings = filter(
-            lambda standing: standing.participation_type == ParticipationType.IN_CONTEST
-            or (
-                standing.participation_type == ParticipationType.VIRTUAL
-                and request.virtual_enabled
-            ),
-            standings,
+        standings = list(
+            filter(
+                lambda standing: standing.participation_type
+                == ParticipationType.IN_CONTEST
+                or (
+                    standing.participation_type == ParticipationType.VIRTUAL
+                    and request.virtual_enabled
+                ),
+                standings,
+            )
         )
 
         if request.virtual_enabled:
