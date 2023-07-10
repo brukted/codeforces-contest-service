@@ -13,7 +13,7 @@ from scraper.page_loader import PageLoader
 
 from dotenv import load_dotenv
 
-from service.codefroces_service import CodeForcesService
+from service.codeforces_service import CodeForcesService
 
 load_dotenv()
 
