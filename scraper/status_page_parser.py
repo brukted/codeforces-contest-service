@@ -27,7 +27,6 @@ def parse_status_page(page: str) -> list[Submission]:
     # first row is header
     for row in rows[1:]:
         cells: list[Tag] = row.find_all("td", recursive=False)
-        print(cells[0])
         submission_id = int(cells[0].text.strip())
         when = datetime.datetime.strptime(cells[1].text.strip(), "%b/%d/%Y %H:%M")
         # convert when from machine timezone to UTC
