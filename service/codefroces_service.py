@@ -1,4 +1,5 @@
 from math import inf
+import asyncio
 from typing import Iterable
 from models.domain.problem import Problem
 from models.domain.problem_result import ProblemResult
@@ -26,10 +27,24 @@ class CodeForcesService:
         pages_count = get_page_count(page)
         result: list[Standing] = []
 
-        for page_index in range(1, pages_count + 1):
-            print(f"Retrieving standings page {page_index} / {pages_count}")
-            page = await self.page_loader.get_standings_page(gym_id, page_index)
-            result.extend(parse_standings(page))
+        # Semaphore is used to limit the number of concurrent requests to the server
+        sem = asyncio.Semaphore(6)
+
+        async def get_page(page_index: int):
+            async with sem:
+                print(f"Retrieving standings page {page_index} / {pages_count}")
+                page = await self.page_loader.get_standings_page(gym_id, page_index)
+                return page
+
+        async def get_standings(page_index: int):
+            page = await get_page(page_index)
+            return parse_standings(page)
+
+        tasks = [get_standings(page_index) for page_index in range(1, pages_count + 1)]
+        standings = await asyncio.gather(*tasks)
+
+        for standing in standings:
+            result.extend(standing)
 
         return result
 

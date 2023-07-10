@@ -39,7 +39,9 @@ def health_check() -> JSendResponse[None]:
 
 
 @app.post("/contest/{gym_id}/summary")
-async def get_contest_summary(gym_id: int, request: ContestSummaryRequest):
+async def get_contest_summary(
+    gym_id: int, request: ContestSummaryRequest
+) -> JSendResponse[ContestSummary]:
     request.gym_id = gym_id
     page_loader = PageLoader(configuration)
     await page_loader.authenticate()
