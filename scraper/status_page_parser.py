@@ -27,7 +27,8 @@ def parse_status_page(page: str) -> list[Submission]:
     # first row is header
     for row in rows[1:]:
         cells: list[Tag] = row.find_all("td", recursive=False)
-        submission_id = int(cells[0].find("a").string)
+        print(cells[0])
+        submission_id = int(cells[0].text.strip())
         when = datetime.datetime.strptime(cells[1].text.strip(), "%b/%d/%Y %H:%M")
         # convert when from machine timezone to UTC
         when = datetime.datetime.utcfromtimestamp(when.timestamp())
@@ -37,10 +38,10 @@ def parse_status_page(page: str) -> list[Submission]:
         who = cells[2].find("a")["href"].split("/")[-1].strip().lower()
         is_virtual = cells[2].find("sup") is not None
         index = cells[3].find("a")["href"].split("/")[-1].strip()
-        lang = cells[4].string.strip()
-        verdict = cells[5].find("a").text.strip()
-        time = int("".join(filter(lambda ch: ch.isdigit(), cells[6].string.strip())))
-        memory = int("".join(filter(lambda ch: ch.isdigit(), cells[7].string.strip())))
+        lang = cells[4].text.strip()
+        verdict = cells[5].text.strip()
+        time = int("".join(filter(lambda ch: ch.isdigit(), cells[6].text.strip())))
+        memory = int("".join(filter(lambda ch: ch.isdigit(), cells[7].text.strip())))
         submissions.append(
             Submission(
                 id=submission_id,
