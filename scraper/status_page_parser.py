@@ -28,12 +28,14 @@ def parse_status_page(page: str) -> list[Submission]:
     for row in rows[1:]:
         cells: list[Tag] = row.find_all("td", recursive=False)
         submission_id = int(cells[0].text.strip())
+        # this is utc + 3, regardless of the machine's timezone
         when = datetime.datetime.strptime(cells[1].text.strip(), "%b/%d/%Y %H:%M")
-        # convert when from machine timezone to UTC
-        when = datetime.datetime.utcfromtimestamp(when.timestamp())
-        # Convert the datetime object to UTC timezone
-        utc_timezone = pytz.timezone("UTC")
-        when_utc = when.astimezone(utc_timezone)
+        when_utc = (
+            pytz.timezone("Europe/Moscow")
+            .localize(when)
+            .astimezone(pytz.utc)
+            .timestamp()
+        )
         who = cells[2].find("a")["href"].split("/")[-1].strip().lower()
         is_virtual = cells[2].find("sup") is not None
         index = cells[3].find("a")["href"].split("/")[-1].strip()
@@ -44,7 +46,7 @@ def parse_status_page(page: str) -> list[Submission]:
         submissions.append(
             Submission(
                 id=submission_id,
-                submission_time_utc=datetime.datetime.timestamp(when_utc),
+                submission_time_utc=when_utc,
                 handle=who,
                 is_virtual=is_virtual,
                 problem_index=index,
