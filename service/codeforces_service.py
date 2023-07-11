@@ -29,7 +29,7 @@ class CodeForcesService:
         result: list[Standing] = []
 
         # Semaphore is used to limit the number of concurrent requests to the server
-        sem = asyncio.Semaphore(6)
+        sem = asyncio.Semaphore(10)
 
         async def get_page(page_index: int):
             async with sem:
