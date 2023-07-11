@@ -63,7 +63,13 @@ class CodeForcesService:
     def __correct_rank(self, standings: Iterable[Standing]) -> list[Standing]:
         result: list[Standing] = sorted(standings, key=lambda standing: standing.rank)
         for i, standing in enumerate(result):
-            standing.rank = i + 1
+            if i == 0:
+                standing.rank = 1
+            elif standing.penalty == result[i - 1].penalty:
+                standing.rank = result[i - 1].rank
+            else:
+                standing.rank = i + 1
+
         return result
 
     def __remove_dual_participation(self, standings: list[Standing]) -> list[Standing]:
