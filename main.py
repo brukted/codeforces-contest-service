@@ -30,7 +30,7 @@ app = FastAPI()
 async def unicorn_exception_handler(request: Request, exc: httpx.ReadTimeout):
     return JSONResponse(
         status_code=500,
-        content=json.dumps(JSendResponse(message="Connect timeout.", data=None)),
+        content=JSendResponse(message="Connect timeout.", data=None).model_dump_json(),
     )
 
 
