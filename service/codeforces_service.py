@@ -1,3 +1,4 @@
+from collections import defaultdict
 from math import inf
 import asyncio
 from typing import Iterable
@@ -121,6 +122,10 @@ class CodeForcesService:
 
         submissions_lookup: dict[int, Submission] = {sub.id: sub for sub in submissions}
 
+        submissions_by_handle: defaultdict[str, list[Submission]] = defaultdict(list)
+        for sub in submissions:
+            submissions_by_handle[sub.handle].append(sub)
+
         # remove non in contest participation if virtual disabled
         standings = list(
             filter(
@@ -157,6 +162,17 @@ class CodeForcesService:
             earliest_submission_time = min(
                 map(get_submission_time, standing.problem_results)
             )
+
+            if earliest_submission_time == inf:
+                # user didn't solve any problem, so we take the time of the earliest submission by this user
+                # this is only needed for virtual participation, because in contest participation is not
+                # checked against virtual deadline
+                earliest_submission_time = min(
+                    map(
+                        lambda sub: sub.submission_time_utc,
+                        submissions_by_handle[standing.handle],
+                    )
+                )
 
             if (
                 standing.participation_type == ParticipationType.VIRTUAL
