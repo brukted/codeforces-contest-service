@@ -144,7 +144,7 @@ class CodeForcesService:
 
         for standing in standings:
             current = (
-                dict[standing.handle]
+                earliest_standing[standing.handle]
                 if standing.handle in earliest_standing
                 else (inf, standing)
             )

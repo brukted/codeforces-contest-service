@@ -2,6 +2,7 @@ import json
 import os
 from fastapi import FastAPI, HTTPException, Request
 import httpcore
+import httpx
 from models.domain.problem import Problem
 from fastapi.responses import JSONResponse
 
@@ -25,8 +26,8 @@ configuration = {
 app = FastAPI()
 
 
-@app.exception_handler(httpcore.ConnectTimeout)
-async def unicorn_exception_handler(request: Request, exc: httpcore.ConnectTimeout):
+@app.exception_handler(httpx.ReadTimeout)
+async def unicorn_exception_handler(request: Request, exc: httpx.ReadTimeout):
     return JSONResponse(
         status_code=500,
         content=json.dumps(JSendResponse(message="Connect timeout.", data=None)),
