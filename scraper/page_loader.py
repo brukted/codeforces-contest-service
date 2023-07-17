@@ -1,3 +1,4 @@
+import os
 import string
 from bs4 import BeautifulSoup
 import pickle
@@ -64,6 +65,13 @@ class PageLoader:
 
     async def get_status_page(self, gym_id, page_index):
         url = f"https://codeforces.com/gym/{gym_id}/status?pageIndex={page_index}&order=BY_JUDGED_DESC"
+        cache_path = f"cache/status/{gym_id}_{page_index}.html"
+
+        if os.path.exists(cache_path):
+            with open(cache_path, "rb") as f:
+                return f.read()
         data = await self.async_session.get(url)
         data.raise_for_status()
+        with open(cache_path, "wb") as f:
+            f.write(data.content)
         return data.text
