@@ -1,5 +1,13 @@
-FROM python:3.9
+FROM python:3.11.5
 
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
-COPY ./app /code/app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+RUN mkdir /code
+
+WORKDIR /code
+
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=80"]
