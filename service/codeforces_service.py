@@ -28,7 +28,7 @@ class CodeForcesService:
         pages_count = get_page_count(page)
         result: list[Standing] = []
 
-        # Semaphore is used to limit the number of concurrent requests to the server
+        # Semaphore is used to limit the number of concurrent requests to codeforces
         sem = asyncio.Semaphore(10)
 
         async def get_page(page_index: int):
@@ -54,10 +54,26 @@ class CodeForcesService:
         pages_count = get_status_page_count(page)
         result: list[Submission] = []
 
-        for page_index in range(1, pages_count + 1):
-            print(f"Retrieving submissions page {page_index} / {pages_count}")
-            page = await self.page_loader.get_status_page(gym_id, page_index)
-            result.extend(parse_status_page(page))
+        # Semaphore is used to limit the number of concurrent requests to the codeforces
+        sem = asyncio.Semaphore(10)
+
+        async def get_page(page_index: int):
+            async with sem:
+                print(f"Retrieving submissions page {page_index} / {pages_count}")
+                page = await self.page_loader.get_status_page(gym_id, page_index)
+                return page
+
+        async def get_submissions(page_index: int):
+            page = await get_page(page_index)
+            return parse_status_page(page)
+
+        tasks = [
+            get_submissions(page_index) for page_index in range(1, pages_count + 1)
+        ]
+        submissions = await asyncio.gather(*tasks)
+
+        for submission in submissions:
+            result.extend(submission)
 
         return result
 
