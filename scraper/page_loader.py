@@ -19,8 +19,7 @@ class PageLoader:
     async def authenticate(self):
         login = await self.async_session.get("https://codeforces.com/enter")
         ss = BeautifulSoup(login.text, features="html.parser")
-
-        csrf_token = ss.find("input", {"name": "csrf-token"})["value"]
+        csrf_token = ss.find("input", {"name": "csrf_token"})["value"]
 
         payload = {
             "handleOrEmail": self.handle_or_email,
